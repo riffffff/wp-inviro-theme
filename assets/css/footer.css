@@ -1,0 +1,193 @@
+/**
+ * Footer Styles
+ */
+
+.site-footer {
+    background-color: var(--bg-dark);
+    color: white;
+}
+
+.footer-top {
+    background: linear-gradient(135deg, var(--secondary-color), var(--secondary-dark));
+    padding: 4rem 0 2rem;
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: 1.5fr 2.5fr;
+    gap: 3rem;
+    margin-bottom: 2rem;
+}
+
+.footer-brand {
+    max-width: 400px;
+}
+
+.footer-logo {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    color: white;
+}
+
+.footer-description {
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+    opacity: 0.9;
+}
+
+.footer-social {
+    display: flex;
+    gap: 1rem;
+}
+
+.footer-social a {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    color: white;
+}
+
+.footer-social a:hover {
+    background-color: white;
+    color: var(--secondary-color);
+    transform: translateY(-3px);
+}
+
+.footer-columns {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+}
+
+.footer-title {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    color: white;
+}
+
+.footer-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-menu li {
+    margin-bottom: 0.5rem;
+}
+
+.footer-menu a {
+    color: rgba(255, 255, 255, 0.8);
+    transition: var(--transition);
+}
+
+.footer-menu a:hover {
+    color: white;
+    padding-left: 5px;
+}
+
+.footer-bottom {
+    background-color: var(--primary-color);
+    padding: 2rem 0;
+}
+
+.footer-bottom-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.copyright {
+    margin: 0;
+    opacity: 0.9;
+}
+
+.footer-links {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.footer-links a {
+    color: rgba(255, 255, 255, 0.8);
+    transition: var(--transition);
+}
+
+.footer-links a:hover {
+    color: white;
+}
+
+.separator {
+    opacity: 0.5;
+}
+
+/* WhatsApp Float Button */
+.whatsapp-float {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 999;
+}
+
+.whatsapp-float a {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #25d366;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-hover);
+    transition: var(--transition);
+    color: white;
+}
+
+.whatsapp-float a:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .footer-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .footer-columns {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .footer-columns {
+        grid-template-columns: 1fr;
+    }
+    
+    .footer-bottom-content {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .whatsapp-float {
+        bottom: 1rem;
+        right: 1rem;
+    }
+    
+    .whatsapp-float a {
+        width: 50px;
+        height: 50px;
+    }
+}
