@@ -119,58 +119,100 @@
 
 /* Statistics Section */
 .stats-section {
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-    padding: 3rem 0;
+    background: linear-gradient(to bottom, #4FB3E8 0%, #75C6F1 100%);
+    padding: 4rem 0;
     color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.stats-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+    pointer-events: none;
 }
 
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 2rem;
+    gap: 3rem;
     text-align: center;
+    position: relative;
+    z-index: 1;
 }
 
 .stat-item {
-    padding: 1rem;
+    padding: 2rem 1.5rem;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.stat-item:hover {
+    transform: translateY(-10px) scale(1.05);
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.2);
 }
 
 .stat-number {
-    font-size: 3rem;
+    font-size: 3.5rem;
     font-weight: 800;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
+    background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.8) 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    line-height: 1;
 }
 
 .stat-label {
-    font-size: 1rem;
-    opacity: 0.9;
+    font-size: 1.1rem;
+    font-weight: 500;
+    opacity: 0.95;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-size: 0.9rem;
 }
 
 /* About Section */
 .about-section {
     padding: 5rem 0;
-    background-color: var(--bg-light);
+    background: linear-gradient(to bottom, #75C6F1 0%, #FFFFFF 100%);
+    position: relative;
 }
 
 .about-content {
     display: grid;
     grid-template-columns: 1fr 2fr;
-    gap: 3rem;
+    gap: 4rem;
     align-items: start;
 }
 
 .about-branches {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
+    gap: 2rem;
 }
 
 .branch-card {
-    background-color: white;
+    background-color: #E91C2E;
     border-radius: var(--border-radius);
     overflow: hidden;
     box-shadow: var(--shadow);
     transition: var(--transition);
+    width: max-content;
+    border: 2px solid white;
 }
 
 .branch-card:hover {
@@ -200,6 +242,7 @@
     font-size: 1rem;
     text-align: center;
     margin: 0;
+    color: white;
 }
 
 .about-text {
@@ -209,19 +252,22 @@
 .section-title {
     font-size: 2.5rem;
     margin-bottom: 1.5rem;
-    color: var(--primary-color);
+    color: black;
+    text-align: center;
 }
 
 .about-description {
     font-size: 1.1rem;
     line-height: 1.8;
     color: var(--text-light);
+    text-align: justify;
 }
 
 /* Products Section */
 .products-section {
     padding: 5rem 0;
-    background-color: white;
+    background: linear-gradient(to bottom, #FFFFFF 0%, #75C6F1 100%);
+    position: relative;
 }
 
 .section-header {
@@ -288,13 +334,27 @@
     justify-content: center;
     cursor: pointer;
     box-shadow: var(--shadow);
-    transition: var(--transition);
+    transition: all 0.3s ease;
     color: var(--text-light);
+    z-index: 10;
 }
 
 .product-like:hover {
     color: #e74c3c;
     transform: scale(1.1);
+}
+
+.product-like.liked {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.product-like.liked svg {
+    fill: white;
+}
+
+.product-like:active {
+    transform: scale(0.9);
 }
 
 .product-info {
@@ -341,52 +401,52 @@
 /* Testimonials Section */
 .testimonials-section {
     padding: 5rem 0;
-    background-color: var(--bg-light);
+    background-color: #f8f9fa;
 }
 
 .testimonials-carousel {
     position: relative;
-    max-width: 1000px;
+    max-width: 1200px;
     margin: 0 auto;
+    overflow: hidden;
+    padding: 0 1rem;
 }
 
 .testimonials-track {
     display: flex;
     gap: 2rem;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
-
-.testimonials-track::-webkit-scrollbar {
-    display: none;
+    transition: transform 0.5s ease-in-out;
+    will-change: transform;
 }
 
 .testimonial-card {
-    flex: 0 0 calc(33.333% - 1.5rem);
-    background-color: white;
+    flex: 0 0 calc(33.333% - 1.33rem);
+    background: var(--primary-color);
     padding: 2rem;
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow);
-    scroll-snap-align: start;
+    border-radius: 16px;
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.08);
+    color: var(--text-color);
+    min-height: 260px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(0,0,0,0.06);
+    transition: var(--transition);
 }
 
 .testimonial-header {
     display: flex;
     align-items: center;
     gap: 1rem;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
 }
 
 .testimonial-avatar {
-    width: 60px;
-    height: 60px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
     overflow: hidden;
     flex-shrink: 0;
+    border: 3px solid rgba(255, 255, 255, 0.3);
 }
 
 .testimonial-avatar img {
@@ -395,85 +455,111 @@
     object-fit: cover;
 }
 
+.testimonial-meta {
+    flex: 1;
+}
+
 .testimonial-name {
-    font-size: 1.1rem;
-    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin: 0 0 0.35rem 0;
+    color: var(--text-color);
 }
 
 .testimonial-date {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     color: var(--text-light);
 }
 
 .testimonial-rating {
     margin-bottom: 1rem;
+    display: flex;
+    gap: 0.25rem;
 }
 
 .star {
-    color: #ddd;
-    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 1.3rem;
 }
 
 .star.filled {
-    color: #ffc107;
+    color: #FFD700;
 }
 
 .star.half {
-    background: linear-gradient(90deg, #ffc107 50%, #ddd 50%);
+    background: linear-gradient(90deg, #FFD700 50%, rgba(255, 255, 255, 0.3) 50%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
 .testimonial-content {
-    color: var(--text-light);
+    color: var(--text-color);
     line-height: 1.6;
+    flex: 1;
+}
+
+.testimonial-content p {
+    margin: 0;
 }
 
 .testimonials-controls {
     display: flex;
     justify-content: center;
     gap: 1rem;
-    margin-top: 2rem;
+    margin-top: 3rem;
 }
 
 .testimonial-prev,
 .testimonial-next {
     background-color: var(--primary-color);
-    color: white;
+    color: #ffffff;
     border: none;
-    width: 40px;
-    height: 40px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     font-size: 1.5rem;
     cursor: pointer;
-    transition: var(--transition);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .testimonial-prev:hover,
 .testimonial-next:hover {
     background-color: var(--primary-dark);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+}
+
+.testimonial-prev:active,
+.testimonial-next:active {
+    transform: scale(0.92);
 }
 
 .testimonials-indicators {
     display: flex;
     justify-content: center;
     gap: 0.5rem;
-    margin-top: 1rem;
+    margin-top: 1.5rem;
 }
 
 .testimonial-indicator {
-    width: 10px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
     background-color: #ddd;
     cursor: pointer;
-    transition: var(--transition);
+    transition: all 0.3s ease;
+    border: none;
+    padding: 0;
 }
 
 .testimonial-indicator.active {
-    background-color: var(--primary-color);
-    width: 30px;
-    border-radius: 5px;
+    background-color: #2F80ED;
+    width: 32px;
+    border-radius: 6px;
 }
 
 /* Contact Section */

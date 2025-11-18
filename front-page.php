@@ -61,40 +61,65 @@ get_header();
             <div class="about-content">
                 <div class="about-branches">
                     <?php
-                    $branches = new WP_Query(array(
-                        'post_type' => 'cabang',
-                        'posts_per_page' => 4,
-                        'orderby' => 'date',
-                        'order' => 'ASC'
-                    ));
+                    // Get selected branches from customizer
+                    $displayed_branches = array();
+                    for ($i = 1; $i <= 4; $i++) {
+                        $branch_id = get_theme_mod('inviro_branch_' . $i);
+                        if ($branch_id) {
+                            $displayed_branches[] = $branch_id;
+                        }
+                    }
                     
-                    if ($branches->have_posts()) :
-                        while ($branches->have_posts()) : $branches->the_post();
-                            ?>
-                            <div class="branch-card">
-                                <?php if (has_post_thumbnail()) : ?>
-                                    <div class="branch-image">
-                                        <?php the_post_thumbnail('inviro-branch'); ?>
-                                    </div>
-                                <?php endif; ?>
-                                <h3 class="branch-name"><?php the_title(); ?></h3>
-                            </div>
-                            <?php
-                        endwhile;
-                        wp_reset_postdata();
-                    else :
-                        // Default branch cards
-                        $default_branches = array('INVIRO Jogja', 'INVIRO Jakarta', 'INVIRO Surabaya', 'INVIRO Bandung');
-                        foreach ($default_branches as $branch) :
-                            ?>
-                            <div class="branch-card">
-                                <div class="branch-image">
-                                    <img src="<?php echo get_template_directory_uri(); ?>/assets/images/branch-placeholder.jpg" alt="<?php echo esc_attr($branch); ?>">
+                    // Display selected branches
+                    if (!empty($displayed_branches)) :
+                        $branches_query = new WP_Query(array(
+                            'post_type' => 'cabang',
+                            'post__in' => $displayed_branches,
+                            'orderby' => 'post__in',
+                            'posts_per_page' => 4
+                        ));
+                        
+                        if ($branches_query->have_posts()) :
+                            while ($branches_query->have_posts()) : $branches_query->the_post();
+                                $location = get_post_meta(get_the_ID(), '_branch_location', true);
+                                ?>
+                                <div class="branch-card">
+                                    <?php if (has_post_thumbnail()) : ?>
+                                        <div class="branch-image">
+                                            <?php the_post_thumbnail('inviro-branch'); ?>
+                                        </div>
+                                    <?php endif; ?>
+                                    <h3 class="branch-name"><?php the_title(); ?></h3>
                                 </div>
-                                <h3 class="branch-name"><?php echo esc_html($branch); ?></h3>
-                            </div>
-                            <?php
-                        endforeach;
+                                <?php
+                            endwhile;
+                            wp_reset_postdata();
+                        endif;
+                    else :
+                        // Fallback: display latest 4 branches if none selected
+                        $branches_query = new WP_Query(array(
+                            'post_type' => 'cabang',
+                            'posts_per_page' => 4,
+                            'orderby' => 'date',
+                            'order' => 'DESC'
+                        ));
+                        
+                        if ($branches_query->have_posts()) :
+                            while ($branches_query->have_posts()) : $branches_query->the_post();
+                                $location = get_post_meta(get_the_ID(), '_branch_location', true);
+                                ?>
+                                <div class="branch-card">
+                                    <?php if (has_post_thumbnail()) : ?>
+                                        <div class="branch-image">
+                                            <?php the_post_thumbnail('inviro-branch'); ?>
+                                        </div>
+                                    <?php endif; ?>
+                                    <h3 class="branch-name"><?php the_title(); ?></h3>
+                                </div>
+                                <?php
+                            endwhile;
+                            wp_reset_postdata();
+                        endif;
                     endif;
                     ?>
                 </div>
@@ -119,25 +144,50 @@ get_header();
             
             <div class="products-grid">
                 <?php
-                $products = new WP_Query(array(
+                // Get featured products from customizer
+                $featured_products = array();
+                for ($i = 1; $i <= 8; $i++) {
+                    $product_id = get_theme_mod('inviro_featured_product_' . $i);
+                    if ($product_id) {
+                        $featured_products[] = $product_id;
+                    }
+                }
+                
+                // Get products count from customizer
+                $products_count = get_theme_mod('inviro_products_count', 8);
+                
+                // Query args
+                $args = array(
                     'post_type' => 'produk',
-                    'posts_per_page' => 8,
+                    'posts_per_page' => $products_count,
                     'orderby' => 'date',
                     'order' => 'DESC'
-                ));
+                );
+                
+                // If there are featured products, prioritize them
+                if (!empty($featured_products)) {
+                    $args['post__in'] = $featured_products;
+                    $args['orderby'] = 'post__in';
+                }
+                
+                $products = new WP_Query($args);
                 
                 if ($products->have_posts()) :
                     while ($products->have_posts()) : $products->the_post();
                         $price = get_post_meta(get_the_ID(), '_product_price', true);
                         $original_price = get_post_meta(get_the_ID(), '_product_original_price', true);
+                        $buy_url = get_post_meta(get_the_ID(), '_product_buy_url', true);
+                        
+                        // Fallback URL jika tidak diisi
+                        if (empty($buy_url)) {
+                            $buy_url = get_theme_mod('inviro_whatsapp') ? 'https://wa.me/' . get_theme_mod('inviro_whatsapp') : '#';
+                        }
                         ?>
-                        <article class="product-card" itemscope itemtype="https://schema.org/Product">
+                        <article class="product-card" data-product-id="<?php echo esc_attr(get_the_ID()); ?>" itemscope itemtype="https://schema.org/Product">
                             <?php if (has_post_thumbnail()) : ?>
                                 <div class="product-image">
-                                    <a href="<?php the_permalink(); ?>">
-                                        <?php the_post_thumbnail('inviro-product'); ?>
-                                    </a>
-                                    <button class="product-like" aria-label="Like product">
+                                    <?php the_post_thumbnail('inviro-product'); ?>
+                                    <button class="product-like" data-product-id="<?php echo esc_attr(get_the_ID()); ?>" aria-label="Like product">
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                                         </svg>
@@ -146,9 +196,7 @@ get_header();
                             <?php endif; ?>
                             
                             <div class="product-info">
-                                <h3 class="product-title" itemprop="name">
-                                    <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
-                                </h3>
+                                <h3 class="product-title" itemprop="name"><?php the_title(); ?></h3>
                                 
                                 <div class="product-price" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
                                     <?php if ($original_price) : ?>
@@ -159,7 +207,7 @@ get_header();
                                     <?php endif; ?>
                                 </div>
                                 
-                                <a href="<?php the_permalink(); ?>" class="btn btn-product"><?php esc_html_e('Beli', 'inviro'); ?></a>
+                                <a href="<?php echo esc_url($buy_url); ?>" class="btn btn-product" target="_blank" rel="noopener"><?php esc_html_e('Beli', 'inviro'); ?></a>
                             </div>
                             
                             <meta itemprop="description" content="<?php echo esc_attr(wp_strip_all_tags(get_the_excerpt())); ?>">
@@ -205,65 +253,81 @@ get_header();
     <section id="testimonials" class="testimonials-section">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title"><?php echo esc_html(get_theme_mod('inviro_testimonials_title', 'Testimoni Pelanggan')); ?></h2>
-                <p class="section-subtitle"><?php echo esc_html(get_theme_mod('inviro_testimonials_subtitle', 'Apa kata mereka tentang produk kami')); ?></p>
+                    <h2 class="section-title"><?php echo esc_html(get_theme_mod('inviro_testimonials_title', 'Dipercaya Oleh Banyak Pelanggan')); ?></h2>
+                <p class="section-subtitle"><?php echo esc_html(get_theme_mod('inviro_testimonials_subtitle', '95% Pelanggan INVIRO di berbagai daerah di Indonesia merasa puas dengan pelayanan & produk INVIRO')); ?></p>
             </div>
             
             <div class="testimonials-carousel">
                 <div class="testimonials-track">
                     <?php
-                    $testimonials = new WP_Query(array(
-                        'post_type' => 'testimoni',
-                        'posts_per_page' => -1,
-                        'orderby' => 'date',
-                        'order' => 'DESC'
-                    ));
+                    // Get selected testimonials from customizer (up to 10)
+                    $selected_testimonials = array();
+                    for ($i = 1; $i <= 10; $i++) {
+                        $testimonial_id = get_theme_mod('inviro_testimonial_' . $i);
+                        if ($testimonial_id) {
+                            $selected_testimonials[] = $testimonial_id;
+                        }
+                    }
                     
-                    if ($testimonials->have_posts()) :
-                        while ($testimonials->have_posts()) : $testimonials->the_post();
-                            $rating = get_post_meta(get_the_ID(), '_testimonial_rating', true);
-                            $date = get_post_meta(get_the_ID(), '_testimonial_date', true);
-                            if (!$rating) $rating = 5;
-                            if (!$date) $date = get_the_date('Y-m-d');
-                            ?>
-                            <div class="testimonial-card" itemscope itemtype="https://schema.org/Review">
-                                <div class="testimonial-header">
-                                    <?php if (has_post_thumbnail()) : ?>
-                                        <div class="testimonial-avatar">
-                                            <?php the_post_thumbnail('inviro-testimonial'); ?>
+                    if (!empty($selected_testimonials)) :
+                        $testimonials = new WP_Query(array(
+                            'post_type' => 'testimoni',
+                            'post__in' => $selected_testimonials,
+                            'orderby' => 'post__in',
+                            'posts_per_page' => -1
+                        ));
+                        
+                        if ($testimonials->have_posts()) :
+                            while ($testimonials->have_posts()) : $testimonials->the_post();
+                                $customer_name = get_post_meta(get_the_ID(), '_testimonial_customer_name', true);
+                                $rating = get_post_meta(get_the_ID(), '_testimonial_rating', true);
+                                $message = get_post_meta(get_the_ID(), '_testimonial_message', true);
+                                $date = get_post_meta(get_the_ID(), '_testimonial_date', true);
+                                
+                                if (!$customer_name) $customer_name = get_the_title();
+                                if (!$rating) $rating = 5;
+                                if (!$message) $message = get_the_content();
+                                if (!$date) $date = get_the_date('d / m / Y');
+                                ?>
+                                <div class="testimonial-card" itemscope itemtype="https://schema.org/Review">
+                                    <div class="testimonial-header">
+                                        <?php if (has_post_thumbnail()) : ?>
+                                            <div class="testimonial-avatar">
+                                                <?php the_post_thumbnail('inviro-testimonial'); ?>
+                                            </div>
+                                        <?php endif; ?>
+                                        <div class="testimonial-meta">
+                                            <h4 class="testimonial-name" itemprop="author" itemscope itemtype="https://schema.org/Person">
+                                                <span itemprop="name"><?php echo esc_html($customer_name); ?></span>
+                                            </h4>
+                                            <div class="testimonial-date"><?php echo esc_html($date); ?></div>
                                         </div>
-                                    <?php endif; ?>
-                                    <div class="testimonial-meta">
-                                        <h4 class="testimonial-name" itemprop="author" itemscope itemtype="https://schema.org/Person">
-                                            <span itemprop="name"><?php the_title(); ?></span>
-                                        </h4>
-                                        <div class="testimonial-date"><?php echo date_i18n('j/n/Y', strtotime($date)); ?></div>
+                                    </div>
+                                    
+                                    <div class="testimonial-rating" itemprop="reviewRating" itemscope itemtype="https://schema.org/Rating">
+                                        <meta itemprop="ratingValue" content="<?php echo esc_attr($rating); ?>">
+                                        <meta itemprop="bestRating" content="5">
+                                        <?php
+                                        for ($i = 1; $i <= 5; $i++) {
+                                            if ($i <= $rating) {
+                                                echo '<span class="star filled">★</span>';
+                                            } else {
+                                                echo '<span class="star">★</span>';
+                                            }
+                                        }
+                                        ?>
+                                    </div>
+                                    
+                                    <div class="testimonial-content" itemprop="reviewBody">
+                                        <?php echo wpautop(esc_html($message)); ?>
                                     </div>
                                 </div>
-                                
-                                <div class="testimonial-rating" itemprop="reviewRating" itemscope itemtype="https://schema.org/Rating">
-                                    <meta itemprop="ratingValue" content="<?php echo esc_attr($rating); ?>">
-                                    <meta itemprop="bestRating" content="5">
-                                    <?php
-                                    for ($i = 1; $i <= 5; $i++) {
-                                        if ($i <= $rating) {
-                                            echo '<span class="star filled">★</span>';
-                                        } else {
-                                            echo '<span class="star">★</span>';
-                                        }
-                                    }
-                                    ?>
-                                </div>
-                                
-                                <div class="testimonial-content" itemprop="reviewBody">
-                                    <?php the_content(); ?>
-                                </div>
-                            </div>
-                            <?php
-                        endwhile;
-                        wp_reset_postdata();
+                                <?php
+                            endwhile;
+                            wp_reset_postdata();
+                        endif;
                     else :
-                        // Default testimonials
+                        // Default testimonials when none selected
                         $default_testimonials = array(
                             array('name' => 'Robert B.', 'rating' => 5, 'date' => '1/1/2020', 'content' => 'Wow... I am so happy to see this business is turned out to be more than my expectations and as for the service, I am so pleased. Thank you so much!'),
                             array('name' => 'Diana M.', 'rating' => 4.5, 'date' => '1/1/2020', 'content' => 'Wow... I am very happy to use this service. It turned out to be more than my expectations and as for the service, I am so pleased. Thank you so much!'),
@@ -321,13 +385,20 @@ get_header();
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title"><?php echo esc_html(get_theme_mod('inviro_contact_title', 'Hubungi Kami')); ?></h2>
+                <?php 
+                $contact_desc = get_theme_mod('inviro_contact_description', '');
+                if ($contact_desc) : ?>
+                    <p class="section-subtitle"><?php echo esc_html($contact_desc); ?></p>
+                <?php endif; ?>
             </div>
             
             <div class="contact-content">
                 <div class="contact-map">
                     <?php
-                    $map_url = get_theme_mod('inviro_map_url', '');
+                    $map_url = get_theme_mod('inviro_contact_map_url', '');
                     if ($map_url) {
+                        // Simply use iframe with the URL directly - let browser handle it
+                        // Google Maps will auto-convert most URL formats when used in iframe
                         echo '<iframe src="' . esc_url($map_url) . '" width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>';
                     } else {
                         ?>
@@ -338,7 +409,7 @@ get_header();
                                     <circle cx="12" cy="10" r="3"></circle>
                                 </svg>
                                 <p><?php esc_html_e('Peta akan ditampilkan di sini', 'inviro'); ?></p>
-                                <p class="small"><?php esc_html_e('Tambahkan URL Google Maps di Customizer', 'inviro'); ?></p>
+                                <p class="small"><?php esc_html_e('Tambahkan URL embed Google Maps di Customizer', 'inviro'); ?></p>
                             </div>
                         </div>
                         <?php
@@ -347,43 +418,22 @@ get_header();
                 </div>
                 
                 <div class="contact-features">
-                    <div class="feature-item feature-support">
-                        <div class="feature-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                            </svg>
+                    <?php for ($i = 1; $i <= 3; $i++) : 
+                        $icon = get_theme_mod('inviro_contact_feature_' . $i . '_icon', $i == 1 ? 'phone' : ($i == 2 ? 'tag' : 'map-pin'));
+                        $title = get_theme_mod('inviro_contact_feature_' . $i . '_title', $i == 1 ? 'Customer Support' : ($i == 2 ? 'Harga & Kualitas Terjamin' : 'Banyak Lokasi'));
+                        $description = get_theme_mod('inviro_contact_feature_' . $i . '_description', $i == 1 ? 'Tim support kami siap membantu Anda 24/7' : ($i == 2 ? 'Harga terbaik dengan kualitas premium' : 'Hadir di berbagai kota di Indonesia'));
+                        $color = get_theme_mod('inviro_contact_feature_' . $i . '_color', $i == 1 ? '#28a745' : ($i == 2 ? '#ff8c00' : '#dc3545'));
+                        ?>
+                        <div class="feature-item">
+                            <div class="feature-icon" style="background-color: <?php echo esc_attr($color); ?>;">
+                                <?php echo inviro_get_feature_icon($icon); ?>
+                            </div>
+                            <div class="feature-content">
+                                <h3><?php echo esc_html($title); ?></h3>
+                                <p><?php echo esc_html($description); ?></p>
+                            </div>
                         </div>
-                        <div class="feature-content">
-                            <h3><?php esc_html_e('Customer Support', 'inviro'); ?></h3>
-                            <p><?php esc_html_e('Tim support kami siap membantu Anda 24/7', 'inviro'); ?></p>
-                        </div>
-                    </div>
-                    
-                    <div class="feature-item feature-price">
-                        <div class="feature-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
-                                <line x1="7" y1="7" x2="7.01" y2="7"></line>
-                            </svg>
-                        </div>
-                        <div class="feature-content">
-                            <h3><?php esc_html_e('Harga & Kualitas Terjamin', 'inviro'); ?></h3>
-                            <p><?php esc_html_e('Harga terbaik dengan kualitas premium', 'inviro'); ?></p>
-                        </div>
-                    </div>
-                    
-                    <div class="feature-item feature-location">
-                        <div class="feature-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                                <circle cx="12" cy="10" r="3"></circle>
-                            </svg>
-                        </div>
-                        <div class="feature-content">
-                            <h3><?php esc_html_e('Banyak Lokasi', 'inviro'); ?></h3>
-                            <p><?php esc_html_e('Hadir di berbagai kota di Indonesia', 'inviro'); ?></p>
-                        </div>
-                    </div>
+                    <?php endfor; ?>
                 </div>
             </div>
             

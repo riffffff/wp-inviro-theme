@@ -26,14 +26,19 @@ get_header();
                     the_post();
                     $price = get_post_meta(get_the_ID(), '_product_price', true);
                     $original_price = get_post_meta(get_the_ID(), '_product_original_price', true);
+                    $buy_url = get_post_meta(get_the_ID(), '_product_buy_url', true);
+                    $description = get_post_meta(get_the_ID(), '_product_description', true);
+                    
+                    // Fallback URL jika tidak diisi
+                    if (empty($buy_url)) {
+                        $buy_url = get_theme_mod('inviro_whatsapp') ? 'https://wa.me/' . get_theme_mod('inviro_whatsapp') : '#';
+                    }
                     ?>
-                    <article class="product-card" itemscope itemtype="https://schema.org/Product">
+                    <article class="product-card" data-product-id="<?php echo esc_attr(get_the_ID()); ?>" itemscope itemtype="https://schema.org/Product">
                         <?php if (has_post_thumbnail()) : ?>
                             <div class="product-image">
-                                <a href="<?php the_permalink(); ?>">
-                                    <?php the_post_thumbnail('inviro-product'); ?>
-                                </a>
-                                <button class="product-like" aria-label="Like product">
+                                <?php the_post_thumbnail('inviro-product'); ?>
+                                <button class="product-like" data-product-id="<?php echo esc_attr(get_the_ID()); ?>" aria-label="Like product">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                                     </svg>
@@ -42,13 +47,11 @@ get_header();
                         <?php endif; ?>
                         
                         <div class="product-info">
-                            <h3 class="product-title" itemprop="name">
-                                <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
-                            </h3>
+                            <h3 class="product-title" itemprop="name"><?php the_title(); ?></h3>
                             
-                            <?php if (get_the_excerpt()) : ?>
-                                <div class="product-excerpt">
-                                    <?php echo wp_trim_words(get_the_excerpt(), 15); ?>
+                            <?php if ($description) : ?>
+                                <div class="product-description">
+                                    <?php echo wp_trim_words($description, 20); ?>
                                 </div>
                             <?php endif; ?>
                             
@@ -61,10 +64,10 @@ get_header();
                                 <?php endif; ?>
                             </div>
                             
-                            <a href="<?php the_permalink(); ?>" class="btn btn-product"><?php esc_html_e('Lihat Detail', 'inviro'); ?></a>
+                            <a href="<?php echo esc_url($buy_url); ?>" class="btn btn-product" target="_blank" rel="noopener"><?php esc_html_e('Beli', 'inviro'); ?></a>
                         </div>
                         
-                        <meta itemprop="description" content="<?php echo esc_attr(wp_strip_all_tags(get_the_excerpt())); ?>">
+                        <meta itemprop="description" content="<?php echo esc_attr(wp_strip_all_tags($description)); ?>">
                     </article>
                     <?php
                 endwhile;

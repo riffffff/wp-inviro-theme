@@ -4,10 +4,11 @@
 
 /* Variables */
 :root {
-    --primary-color: #007bff;
-    --primary-dark: #0056b3;
+    --primary-color: #75C6F1;
+    --primary-dark: #4FB3E8;
     --secondary-color: #ff7a00;
     --secondary-dark: #e66a00;
+    --accent-warm: #FE8B25; /* warm orange for footer gradient */
     --text-color: #333;
     --text-light: #666;
     --bg-color: #ffffff;

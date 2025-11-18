@@ -11,6 +11,26 @@ if (!defined('ABSPATH')) {
 }
 
 /**
+ * Get SVG Icon for Contact Features
+ */
+function inviro_get_feature_icon($icon_name) {
+    $icons = array(
+        'phone' => '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>',
+        'tag' => '<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line>',
+        'map-pin' => '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle>',
+        'mail' => '<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline>',
+        'clock' => '<circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>',
+        'shield' => '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>',
+        'award' => '<circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>',
+        'check-circle' => '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>',
+    );
+    
+    $icon_path = isset($icons[$icon_name]) ? $icons[$icon_name] : $icons['phone'];
+    
+    return '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' . $icon_path . '</svg>';
+}
+
+/**
  * Enqueue styles and scripts
  */
 function inviro_enqueue_files() {
@@ -18,13 +38,13 @@ function inviro_enqueue_files() {
     wp_enqueue_style('inviro-fonts', 'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap', array(), null);
     
     // Base styles (always loaded)
-    wp_enqueue_style('inviro-base', get_template_directory_uri() . '/assets/css/base.css', array(), '1.0.0');
-    wp_enqueue_style('inviro-header', get_template_directory_uri() . '/assets/css/header.css', array('inviro-base'), '1.0.0');
-    wp_enqueue_style('inviro-footer', get_template_directory_uri() . '/assets/css/footer.css', array('inviro-base'), '1.0.0');
+    wp_enqueue_style('inviro-base', get_template_directory_uri() . '/assets/css/base.css', array(), '1.0.2');
+    wp_enqueue_style('inviro-header', get_template_directory_uri() . '/assets/css/header.css', array('inviro-base'), '1.0.2');
+    wp_enqueue_style('inviro-footer', get_template_directory_uri() . '/assets/css/footer.css', array('inviro-base'), '1.0.8');
     
     // Page specific styles
     if (is_front_page()) {
-        wp_enqueue_style('inviro-front-page', get_template_directory_uri() . '/assets/css/front-page.css', array('inviro-base'), '1.0.0');
+        wp_enqueue_style('inviro-front-page', get_template_directory_uri() . '/assets/css/front-page.css', array('inviro-base'), '1.0.3');
     } elseif (is_page('profil')) {
         wp_enqueue_style('inviro-profil', get_template_directory_uri() . '/assets/css/profil.css', array('inviro-base'), '1.0.0');
     } elseif (is_page('pelanggan')) {
@@ -35,7 +55,7 @@ function inviro_enqueue_files() {
     } elseif (is_single()) {
         wp_enqueue_style('inviro-single', get_template_directory_uri() . '/assets/css/single.css', array('inviro-base'), '1.0.0');
     } elseif (is_archive() || is_post_type_archive()) {
-        wp_enqueue_style('inviro-archive', get_template_directory_uri() . '/assets/css/archive.css', array('inviro-base'), '1.0.0');
+        wp_enqueue_style('inviro-archive', get_template_directory_uri() . '/assets/css/archive.css', array('inviro-base'), '1.0.3');
     }
     
     // Enqueue main stylesheet for fallback
@@ -43,7 +63,7 @@ function inviro_enqueue_files() {
     
     // Enqueue scripts
     wp_enqueue_script('jquery');
-    wp_enqueue_script('inviro-js', get_template_directory_uri() . '/assets/js/main.js', array('jquery'), '1.0.0', true);
+    wp_enqueue_script('inviro-js', get_template_directory_uri() . '/assets/js/main.js', array('jquery'), '1.0.5', true);
     
     // Localize script for AJAX
     wp_localize_script('inviro-js', 'inviroAjax', array(
@@ -107,26 +127,25 @@ function inviro_register_products() {
     
     $args = array(
         'labels'              => $labels,
-        'public'              => true,
-        'publicly_queryable'  => true,
-        'show_ui'             => true,
+        'public'              => false,  // Tidak ada single page
+        'publicly_queryable'  => true,   // Archive bisa diakses
+        'show_ui'             => true,   // Tampil di admin
         'show_in_menu'        => true,
         'query_var'           => true,
-        'rewrite'             => array('slug' => 'produk'),
-        'capability_type'     => 'post',
-        'has_archive'         => true,
+        'has_archive'         => 'produk',  // URL archive: /produk/
+        'rewrite'             => array('slug' => 'produk', 'with_front' => false),
         'hierarchical'        => false,
         'menu_position'       => 5,
         'menu_icon'           => 'dashicons-cart',
-        'supports'            => array('title', 'editor', 'thumbnail', 'excerpt'),
-        'show_in_rest'        => true
+        'supports'            => array('title', 'thumbnail'),  // Hanya title dan thumbnail, tanpa editor
+        'show_in_rest'        => false  // Nonaktifkan Gutenberg editor
     );
     
     register_post_type('produk', $args);
 }
 add_action('init', 'inviro_register_products');
 
-// Testimonials Custom Post Type
+// Testimonials Custom Post Type (No Single Page)
 function inviro_register_testimonials() {
     $labels = array(
         'name'               => __('Testimoni', 'inviro'),
@@ -144,18 +163,18 @@ function inviro_register_testimonials() {
     
     $args = array(
         'labels'              => $labels,
-        'public'              => true,
-        'publicly_queryable'  => true,
+        'public'              => false,
+        'publicly_queryable'  => false,
         'show_ui'             => true,
         'show_in_menu'        => true,
         'query_var'           => true,
-        'rewrite'             => array('slug' => 'testimoni'),
+        'rewrite'             => false,
         'capability_type'     => 'post',
-        'has_archive'         => true,
+        'has_archive'         => false,
         'hierarchical'        => false,
         'menu_position'       => 6,
         'menu_icon'           => 'dashicons-format-quote',
-        'supports'            => array('title', 'editor', 'thumbnail'),
+        'supports'            => array('title', 'thumbnail'),
         'show_in_rest'        => true
     );
     
@@ -163,7 +182,7 @@ function inviro_register_testimonials() {
 }
 add_action('init', 'inviro_register_testimonials');
 
-// Branches Custom Post Type
+// Cabang Custom Post Type (No Single Page)
 function inviro_register_branches() {
     $labels = array(
         'name'               => __('Cabang', 'inviro'),
@@ -181,25 +200,75 @@ function inviro_register_branches() {
     
     $args = array(
         'labels'              => $labels,
-        'public'              => true,
-        'publicly_queryable'  => true,
-        'show_ui'             => true,
+        'public'              => false,  // Tidak ada single page
+        'publicly_queryable'  => false,  // Tidak bisa diakses dari depan
+        'show_ui'             => true,   // Tampil di admin
         'show_in_menu'        => true,
-        'query_var'           => true,
-        'rewrite'             => array('slug' => 'cabang'),
+        'query_var'           => false,
         'capability_type'     => 'post',
-        'has_archive'         => true,
+        'has_archive'         => false,  // Tidak ada archive
         'hierarchical'        => false,
         'menu_position'       => 7,
         'menu_icon'           => 'dashicons-location',
-        'supports'            => array('title', 'editor', 'thumbnail'),
+        'supports'            => array('title', 'thumbnail'),
         'show_in_rest'        => true,
-        'taxonomies'          => array('region')
     );
     
     register_post_type('cabang', $args);
 }
 add_action('init', 'inviro_register_branches');
+
+/**
+ * Add Meta Box for Branch Location
+ */
+function inviro_branch_meta_boxes() {
+    add_meta_box(
+        'inviro_branch_location',
+        __('Lokasi Cabang', 'inviro'),
+        'inviro_branch_location_callback',
+        'cabang',
+        'normal',
+        'high'
+    );
+}
+add_action('add_meta_boxes', 'inviro_branch_meta_boxes');
+
+/**
+ * Meta Box Callback
+ */
+function inviro_branch_location_callback($post) {
+    wp_nonce_field('inviro_branch_location_nonce', 'inviro_branch_location_nonce');
+    $location = get_post_meta($post->ID, '_branch_location', true);
+    ?>
+    <p>
+        <label for="branch_location"><?php _e('Alamat/Lokasi Cabang:', 'inviro'); ?></label><br>
+        <textarea name="branch_location" id="branch_location" rows="3" style="width: 100%;"><?php echo esc_textarea($location); ?></textarea>
+    </p>
+    <?php
+}
+
+/**
+ * Save Branch Location Meta
+ */
+function inviro_save_branch_location($post_id) {
+    if (!isset($_POST['inviro_branch_location_nonce'])) {
+        return;
+    }
+    if (!wp_verify_nonce($_POST['inviro_branch_location_nonce'], 'inviro_branch_location_nonce')) {
+        return;
+    }
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+        return;
+    }
+    if (!current_user_can('edit_post', $post_id)) {
+        return;
+    }
+    
+    if (isset($_POST['branch_location'])) {
+        update_post_meta($post_id, '_branch_location', sanitize_textarea_field($_POST['branch_location']));
+    }
+}
+add_action('save_post_cabang', 'inviro_save_branch_location');
 
 // Proyek Pelanggan Custom Post Type
 function inviro_register_proyek_pelanggan() {
@@ -410,7 +479,16 @@ add_action('init', 'inviro_register_unduhan');
  */
 function inviro_add_product_meta_boxes() {
     add_meta_box(
-        'product_price',
+        'inviro_product_description',
+        __('Deskripsi Produk', 'inviro'),
+        'inviro_product_description_callback',
+        'produk',
+        'normal',
+        'high'
+    );
+    
+    add_meta_box(
+        'inviro_product_price',
         __('Harga Produk', 'inviro'),
         'inviro_product_price_callback',
         'produk',
@@ -419,9 +497,9 @@ function inviro_add_product_meta_boxes() {
     );
     
     add_meta_box(
-        'product_original_price',
-        __('Harga Asli (Optional)', 'inviro'),
-        'inviro_product_original_price_callback',
+        'inviro_product_buy_url',
+        __('URL Tombol Beli', 'inviro'),
+        'inviro_product_buy_url_callback',
         'produk',
         'normal',
         'high'
@@ -429,24 +507,70 @@ function inviro_add_product_meta_boxes() {
 }
 add_action('add_meta_boxes', 'inviro_add_product_meta_boxes');
 
+/**
+ * Product Description Meta Box Callback
+ */
+function inviro_product_description_callback($post) {
+    wp_nonce_field('inviro_product_meta_nonce', 'inviro_product_meta_nonce');
+    $description = get_post_meta($post->ID, '_product_description', true);
+    ?>
+    <p>
+        <label for="product_description"><?php _e('Deskripsi Produk:', 'inviro'); ?></label><br>
+        <textarea name="product_description" id="product_description" rows="5" style="width: 100%; padding: 8px;" placeholder="Mesin RO 20.000 GPD dengan kapasitas setara 2000 liter/jam..."><?php echo esc_textarea($description); ?></textarea>
+    </p>
+    <p class="description">
+        <?php _e('Tulis deskripsi lengkap tentang produk ini.', 'inviro'); ?>
+    </p>
+    <?php
+}
+
+/**
+ * Product Price Meta Box Callback
+ */
 function inviro_product_price_callback($post) {
-    wp_nonce_field('inviro_product_meta', 'inviro_product_meta_nonce');
     $price = get_post_meta($post->ID, '_product_price', true);
-    echo '<input type="text" name="product_price" value="' . esc_attr($price) . '" placeholder="Rp. 5.000.000" style="width: 100%; padding: 8px;" />';
-}
-
-function inviro_product_original_price_callback($post) {
     $original_price = get_post_meta($post->ID, '_product_original_price', true);
-    echo '<input type="text" name="product_original_price" value="' . esc_attr($original_price) . '" placeholder="Rp. 6.000.000" style="width: 100%; padding: 8px;" />';
+    ?>
+    <p>
+        <label for="product_price"><?php _e('Harga Jual:', 'inviro'); ?></label><br>
+        <input type="text" name="product_price" id="product_price" value="<?php echo esc_attr($price); ?>" placeholder="Rp. 5.000.000" style="width: 100%; padding: 8px;" />
+    </p>
+    <p>
+        <label for="product_original_price"><?php _e('Harga Asli (Opsional - untuk coret harga):', 'inviro'); ?></label><br>
+        <input type="text" name="product_original_price" id="product_original_price" value="<?php echo esc_attr($original_price); ?>" placeholder="Rp. 6.000.000" style="width: 100%; padding: 8px;" />
+    </p>
+    <p class="description">
+        <?php _e('Harga asli akan ditampilkan dengan coretan jika diisi. Biarkan kosong jika tidak ada diskon.', 'inviro'); ?>
+    </p>
+    <?php
 }
 
+/**
+ * Product Buy URL Meta Box Callback
+ */
+function inviro_product_buy_url_callback($post) {
+    $buy_url = get_post_meta($post->ID, '_product_buy_url', true);
+    ?>
+    <p>
+        <label for="product_buy_url"><?php _e('URL untuk tombol beli:', 'inviro'); ?></label><br>
+        <input type="url" name="product_buy_url" id="product_buy_url" value="<?php echo esc_attr($buy_url); ?>" placeholder="https://wa.me/621234567890" style="width: 100%; padding: 8px;" />
+    </p>
+    <p class="description">
+        <?php _e('Contoh: https://wa.me/621234567890 atau https://tokopedia.com/inviro/produk', 'inviro'); ?>
+    </p>
+    <?php
+}
+
+/**
+ * Save Product Meta
+ */
 function inviro_save_product_meta($post_id) {
     // Check post type
     if (get_post_type($post_id) !== 'produk') {
         return;
     }
     
-    if (!isset($_POST['inviro_product_meta_nonce']) || !wp_verify_nonce($_POST['inviro_product_meta_nonce'], 'inviro_product_meta')) {
+    if (!isset($_POST['inviro_product_meta_nonce']) || !wp_verify_nonce($_POST['inviro_product_meta_nonce'], 'inviro_product_meta_nonce')) {
         return;
     }
     
@@ -456,6 +580,10 @@ function inviro_save_product_meta($post_id) {
     
     if (!current_user_can('edit_post', $post_id)) {
         return;
+    }
+    
+    if (isset($_POST['product_description'])) {
+        update_post_meta($post_id, '_product_description', sanitize_textarea_field($_POST['product_description']));
     }
     
     if (isset($_POST['product_price'])) {
@@ -465,6 +593,10 @@ function inviro_save_product_meta($post_id) {
     if (isset($_POST['product_original_price'])) {
         update_post_meta($post_id, '_product_original_price', sanitize_text_field($_POST['product_original_price']));
     }
+    
+    if (isset($_POST['product_buy_url'])) {
+        update_post_meta($post_id, '_product_buy_url', esc_url_raw($_POST['product_buy_url']));
+    }
 }
 add_action('save_post_produk', 'inviro_save_product_meta');
 
@@ -473,18 +605,9 @@ add_action('save_post_produk', 'inviro_save_product_meta');
  */
 function inviro_add_testimonial_meta_boxes() {
     add_meta_box(
-        'testimonial_rating',
-        __('Rating', 'inviro'),
-        'inviro_testimonial_rating_callback',
-        'testimoni',
-        'normal',
-        'high'
-    );
-    
-    add_meta_box(
-        'testimonial_date',
-        __('Tanggal', 'inviro'),
-        'inviro_testimonial_date_callback',
+        'inviro_testimonial_info',
+        __('Informasi Testimoni', 'inviro'),
+        'inviro_testimonial_info_callback',
         'testimoni',
         'normal',
         'high'
@@ -492,32 +615,61 @@ function inviro_add_testimonial_meta_boxes() {
 }
 add_action('add_meta_boxes', 'inviro_add_testimonial_meta_boxes');
 
-function inviro_testimonial_rating_callback($post) {
-    wp_nonce_field('inviro_testimonial_meta', 'inviro_testimonial_meta_nonce');
+/**
+ * Testimonial Info Meta Box Callback
+ */
+function inviro_testimonial_info_callback($post) {
+    wp_nonce_field('inviro_testimonial_meta_nonce', 'inviro_testimonial_meta_nonce');
+    
+    $customer_name = get_post_meta($post->ID, '_testimonial_customer_name', true);
     $rating = get_post_meta($post->ID, '_testimonial_rating', true);
-    echo '<select name="testimonial_rating" style="width: 100%; padding: 8px;">';
-    for ($i = 1; $i <= 5; $i++) {
-        $selected = ($rating == $i) ? 'selected' : '';
-        echo '<option value="' . $i . '" ' . $selected . '>' . $i . ' Bintang</option>';
-    }
-    echo '</select>';
-}
-
-function inviro_testimonial_date_callback($post) {
+    $message = get_post_meta($post->ID, '_testimonial_message', true);
     $date = get_post_meta($post->ID, '_testimonial_date', true);
+    
     if (!$date) {
-        $date = date('Y-m-d');
+        $date = date('d / m / Y');
     }
-    echo '<input type="date" name="testimonial_date" value="' . esc_attr($date) . '" style="width: 100%; padding: 8px;" />';
+    ?>
+    <p>
+        <label for="testimonial_customer_name"><?php _e('Nama Pelanggan:', 'inviro'); ?></label><br>
+        <input type="text" name="testimonial_customer_name" id="testimonial_customer_name" value="<?php echo esc_attr($customer_name); ?>" placeholder="Robert R." style="width: 100%; padding: 8px;" required />
+    </p>
+    
+    <p>
+        <label for="testimonial_rating"><?php _e('Rating (Bintang):', 'inviro'); ?></label><br>
+        <select name="testimonial_rating" id="testimonial_rating" style="width: 100%; padding: 8px;">
+            <?php for ($i = 1; $i <= 5; $i++) : ?>
+                <option value="<?php echo $i; ?>" <?php selected($rating, $i); ?>><?php echo $i; ?> Bintang</option>
+            <?php endfor; ?>
+        </select>
+    </p>
+    
+    <p>
+        <label for="testimonial_message"><?php _e('Pesan Testimoni:', 'inviro'); ?></label><br>
+        <textarea name="testimonial_message" id="testimonial_message" rows="5" style="width: 100%; padding: 8px;" placeholder="Wow... I am very happy to use this Service, it turned out to be more than my expectations Inviro always the best."><?php echo esc_textarea($message); ?></textarea>
+    </p>
+    
+    <p>
+        <label for="testimonial_date"><?php _e('Tanggal Testimoni:', 'inviro'); ?></label><br>
+        <input type="text" name="testimonial_date" id="testimonial_date" value="<?php echo esc_attr($date); ?>" placeholder="1 / 10 / 2025" style="width: 100%; padding: 8px;" />
+    </p>
+    
+    <p class="description">
+        <?php _e('Foto profil pelanggan dapat diatur di bagian "Featured Image" di sebelah kanan.', 'inviro'); ?>
+    </p>
+    <?php
 }
 
+/**
+ * Save Testimonial Meta
+ */
 function inviro_save_testimonial_meta($post_id) {
     // Check post type
     if (get_post_type($post_id) !== 'testimoni') {
         return;
     }
     
-    if (!isset($_POST['inviro_testimonial_meta_nonce']) || !wp_verify_nonce($_POST['inviro_testimonial_meta_nonce'], 'inviro_testimonial_meta')) {
+    if (!isset($_POST['inviro_testimonial_meta_nonce']) || !wp_verify_nonce($_POST['inviro_testimonial_meta_nonce'], 'inviro_testimonial_meta_nonce')) {
         return;
     }
     
@@ -529,8 +681,16 @@ function inviro_save_testimonial_meta($post_id) {
         return;
     }
     
+    if (isset($_POST['testimonial_customer_name'])) {
+        update_post_meta($post_id, '_testimonial_customer_name', sanitize_text_field($_POST['testimonial_customer_name']));
+    }
+    
     if (isset($_POST['testimonial_rating'])) {
         update_post_meta($post_id, '_testimonial_rating', intval($_POST['testimonial_rating']));
+    }
+    
+    if (isset($_POST['testimonial_message'])) {
+        update_post_meta($post_id, '_testimonial_message', sanitize_textarea_field($_POST['testimonial_message']));
     }
     
     if (isset($_POST['testimonial_date'])) {
@@ -1408,6 +1568,40 @@ function inviro_customize_register($wp_customize) {
         'type'     => 'textarea',
     ));
     
+    // Branches Selection in About Section
+    // Get all branches
+    $branches_query = new WP_Query(array(
+        'post_type' => 'cabang',
+        'posts_per_page' => -1,
+        'orderby' => 'date',
+        'order' => 'DESC'
+    ));
+    
+    $branch_choices = array('' => __('-- Pilih Cabang --', 'inviro'));
+    if ($branches_query->have_posts()) {
+        while ($branches_query->have_posts()) {
+            $branches_query->the_post();
+            $branch_choices[get_the_ID()] = get_the_title();
+        }
+        wp_reset_postdata();
+    }
+    
+    // Select branches to display (4 slots)
+    for ($i = 1; $i <= 4; $i++) {
+        $wp_customize->add_setting('inviro_branch_' . $i, array(
+            'default'           => '',
+            'sanitize_callback' => 'absint',
+        ));
+        
+        $wp_customize->add_control('inviro_branch_' . $i, array(
+            'label'       => sprintf(__('Cabang Slot %d', 'inviro'), $i),
+            'description' => __('Pilih cabang yang akan ditampilkan', 'inviro'),
+            'section'     => 'inviro_about',
+            'type'        => 'select',
+            'choices'     => $branch_choices,
+        ));
+    }
+    
     // Products Section
     $wp_customize->add_section('inviro_products', array(
         'title'    => __('Products Section', 'inviro'),
@@ -1436,6 +1630,57 @@ function inviro_customize_register($wp_customize) {
         'type'     => 'text',
     ));
     
+    // Products Count and Selection
+    $wp_customize->add_setting('inviro_products_count', array(
+        'default'           => '8',
+        'sanitize_callback' => 'absint',
+    ));
+    
+    $wp_customize->add_control('inviro_products_count', array(
+        'label'       => __('Jumlah Produk yang Ditampilkan', 'inviro'),
+        'description' => __('Masukkan jumlah produk yang akan ditampilkan di halaman depan', 'inviro'),
+        'section'     => 'inviro_products',
+        'type'        => 'number',
+        'input_attrs' => array(
+            'min'  => 1,
+            'max'  => 20,
+            'step' => 1,
+        ),
+    ));
+    
+    // Get all product posts
+    $products_query = new WP_Query(array(
+        'post_type' => 'produk',
+        'posts_per_page' => -1,
+        'orderby' => 'date',
+        'order' => 'DESC'
+    ));
+    
+    $product_choices = array('' => __('-- Pilih Produk --', 'inviro'));
+    if ($products_query->have_posts()) {
+        while ($products_query->have_posts()) {
+            $products_query->the_post();
+            $product_choices[get_the_ID()] = get_the_title();
+        }
+        wp_reset_postdata();
+    }
+    
+    // Featured products - manual selection
+    for ($i = 1; $i <= 8; $i++) {
+        $wp_customize->add_setting('inviro_featured_product_' . $i, array(
+            'default'           => '',
+            'sanitize_callback' => 'absint',
+        ));
+        
+        $wp_customize->add_control('inviro_featured_product_' . $i, array(
+            'label'       => sprintf(__('Produk Unggulan %d', 'inviro'), $i),
+            'description' => __('Pilih produk yang akan ditampilkan. Kosongkan untuk otomatis', 'inviro'),
+            'section'     => 'inviro_products',
+            'type'        => 'select',
+            'choices'     => $product_choices,
+        ));
+    }
+    
     // Testimonials Section
     $wp_customize->add_section('inviro_testimonials', array(
         'title'    => __('Testimonials Section', 'inviro'),
@@ -1443,7 +1688,7 @@ function inviro_customize_register($wp_customize) {
     ));
     
     $wp_customize->add_setting('inviro_testimonials_title', array(
-        'default'           => 'Testimoni Pelanggan',
+        'default'           => 'Dipercaya Oleh Banyak Pelanggan',
         'sanitize_callback' => 'sanitize_text_field',
     ));
     
@@ -1454,15 +1699,43 @@ function inviro_customize_register($wp_customize) {
     ));
     
     $wp_customize->add_setting('inviro_testimonials_subtitle', array(
-        'default'           => 'Apa kata mereka tentang produk kami',
-        'sanitize_callback' => 'sanitize_text_field',
+        'default'           => '95% Pelanggan INVIRO di berbagai daerah di Indonesia merasa puas dengan pelayanan & produk INVIRO',
+        'sanitize_callback' => 'sanitize_textarea_field',
     ));
     
     $wp_customize->add_control('inviro_testimonials_subtitle', array(
         'label'    => __('Subtitle Testimoni', 'inviro'),
         'section'  => 'inviro_testimonials',
-        'type'     => 'text',
+        'type'     => 'textarea',
     ));
+    
+    // Get all testimonials for selection
+    $testimonials = get_posts(array(
+        'post_type'      => 'testimoni',
+        'posts_per_page' => -1,
+        'orderby'        => 'title',
+        'order'          => 'ASC'
+    ));
+    
+    $testimonial_choices = array('' => __('-- Pilih Testimoni --', 'inviro'));
+    foreach ($testimonials as $testimonial) {
+        $testimonial_choices[$testimonial->ID] = $testimonial->post_title;
+    }
+    
+    // Add 10 testimonial selection dropdowns (akan tampil 3 per slide di carousel)
+    for ($i = 1; $i <= 10; $i++) {
+        $wp_customize->add_setting('inviro_testimonial_' . $i, array(
+            'default'           => '',
+            'sanitize_callback' => 'absint',
+        ));
+        
+        $wp_customize->add_control('inviro_testimonial_' . $i, array(
+            'label'    => sprintf(__('Testimoni %d', 'inviro'), $i),
+            'section'  => 'inviro_testimonials',
+            'type'     => 'select',
+            'choices'  => $testimonial_choices,
+        ));
+    }
     
     // Contact Section
     $wp_customize->add_section('inviro_contact', array(
@@ -1470,50 +1743,104 @@ function inviro_customize_register($wp_customize) {
         'priority' => 29,
     ));
     
+    // Judul & Deskripsi
     $wp_customize->add_setting('inviro_contact_title', array(
         'default'           => 'Hubungi Kami',
         'sanitize_callback' => 'sanitize_text_field',
     ));
     
     $wp_customize->add_control('inviro_contact_title', array(
-        'label'    => __('Judul Kontak', 'inviro'),
+        'label'    => __('Judul Section', 'inviro'),
         'section'  => 'inviro_contact',
         'type'     => 'text',
     ));
     
-    $wp_customize->add_setting('inviro_contact_phone', array(
-        'default'           => '+62 123 456 7890',
-        'sanitize_callback' => 'sanitize_text_field',
-    ));
-    
-    $wp_customize->add_control('inviro_contact_phone', array(
-        'label'    => __('Nomor Telepon', 'inviro'),
-        'section'  => 'inviro_contact',
-        'type'     => 'text',
-    ));
-    
-    $wp_customize->add_setting('inviro_contact_email', array(
-        'default'           => 'info@inviro.com',
-        'sanitize_callback' => 'sanitize_email',
-    ));
-    
-    $wp_customize->add_control('inviro_contact_email', array(
-        'label'    => __('Email', 'inviro'),
-        'section'  => 'inviro_contact',
-        'type'     => 'email',
-    ));
-    
-    $wp_customize->add_setting('inviro_contact_address', array(
-        'default'           => 'Jl. Contoh No. 123, Jakarta',
+    $wp_customize->add_setting('inviro_contact_description', array(
+        'default'           => '',
         'sanitize_callback' => 'sanitize_textarea_field',
     ));
     
-    $wp_customize->add_control('inviro_contact_address', array(
-        'label'    => __('Alamat', 'inviro'),
+    $wp_customize->add_control('inviro_contact_description', array(
+        'label'    => __('Deskripsi (Opsional)', 'inviro'),
         'section'  => 'inviro_contact',
         'type'     => 'textarea',
     ));
     
+    // Google Maps
+    $wp_customize->add_setting('inviro_contact_map_url', array(
+        'default'           => '',
+        'sanitize_callback' => 'esc_url_raw',
+    ));
+    
+    $wp_customize->add_control('inviro_contact_map_url', array(
+        'label'       => __('URL Embed Google Maps', 'inviro'),
+        'description' => __('Masuk ke Google Maps → Pilih lokasi → Klik "Share" → Tab "Embed a map" → Copy URL dari src="..." → Paste di sini', 'inviro'),
+        'section'     => 'inviro_contact',
+        'type'        => 'url',
+    ));
+    
+    // Feature Items (3 items with icon, title, description)
+    for ($i = 1; $i <= 3; $i++) {
+        // Icon choice
+        $wp_customize->add_setting('inviro_contact_feature_' . $i . '_icon', array(
+            'default'           => $i == 1 ? 'phone' : ($i == 2 ? 'tag' : 'map-pin'),
+            'sanitize_callback' => 'sanitize_text_field',
+        ));
+        
+        $wp_customize->add_control('inviro_contact_feature_' . $i . '_icon', array(
+            'label'    => sprintf(__('Feature %d - Icon', 'inviro'), $i),
+            'description' => __('Pilih: phone, tag, map-pin, mail, clock, shield, award, check-circle', 'inviro'),
+            'section'  => 'inviro_contact',
+            'type'     => 'select',
+            'choices'  => array(
+                'phone'        => __('Phone (Telepon)', 'inviro'),
+                'tag'          => __('Tag (Harga)', 'inviro'),
+                'map-pin'      => __('Map Pin (Lokasi)', 'inviro'),
+                'mail'         => __('Mail (Email)', 'inviro'),
+                'clock'        => __('Clock (Waktu)', 'inviro'),
+                'shield'       => __('Shield (Keamanan)', 'inviro'),
+                'award'        => __('Award (Penghargaan)', 'inviro'),
+                'check-circle' => __('Check Circle (Verifikasi)', 'inviro'),
+            ),
+        ));
+        
+        // Title
+        $wp_customize->add_setting('inviro_contact_feature_' . $i . '_title', array(
+            'default'           => $i == 1 ? 'Customer Support' : ($i == 2 ? 'Harga & Kualitas Terjamin' : 'Banyak Lokasi'),
+            'sanitize_callback' => 'sanitize_text_field',
+        ));
+        
+        $wp_customize->add_control('inviro_contact_feature_' . $i . '_title', array(
+            'label'    => sprintf(__('Feature %d - Judul', 'inviro'), $i),
+            'section'  => 'inviro_contact',
+            'type'     => 'text',
+        ));
+        
+        // Description
+        $wp_customize->add_setting('inviro_contact_feature_' . $i . '_description', array(
+            'default'           => $i == 1 ? 'Tim support kami siap membantu Anda 24/7' : ($i == 2 ? 'Harga terbaik dengan kualitas premium' : 'Hadir di berbagai kota di Indonesia'),
+            'sanitize_callback' => 'sanitize_textarea_field',
+        ));
+        
+        $wp_customize->add_control('inviro_contact_feature_' . $i . '_description', array(
+            'label'    => sprintf(__('Feature %d - Deskripsi', 'inviro'), $i),
+            'section'  => 'inviro_contact',
+            'type'     => 'textarea',
+        ));
+        
+        // Color for icon circle
+        $wp_customize->add_setting('inviro_contact_feature_' . $i . '_color', array(
+            'default'           => $i == 1 ? '#28a745' : ($i == 2 ? '#ff8c00' : '#dc3545'),
+            'sanitize_callback' => 'sanitize_hex_color',
+        ));
+        
+        $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'inviro_contact_feature_' . $i . '_color', array(
+            'label'    => sprintf(__('Feature %d - Warna Icon', 'inviro'), $i),
+            'section'  => 'inviro_contact',
+        )));
+    }
+    
+    // WhatsApp
     $wp_customize->add_setting('inviro_whatsapp', array(
         'default'           => '621234567890',
         'sanitize_callback' => 'sanitize_text_field',
@@ -1524,24 +1851,6 @@ function inviro_customize_register($wp_customize) {
         'description' => __('Format: 621234567890 (tanpa + atau spasi)', 'inviro'),
         'section'     => 'inviro_contact',
         'type'        => 'text',
-    ));
-    
-    // Google Maps Section
-    $wp_customize->add_section('inviro_maps', array(
-        'title'    => __('Pengaturan Peta', 'inviro'),
-        'priority' => 30,
-    ));
-    
-    $wp_customize->add_setting('inviro_map_url', array(
-        'default'           => '',
-        'sanitize_callback' => 'esc_url_raw',
-    ));
-    
-    $wp_customize->add_control('inviro_map_url', array(
-        'label'       => __('URL Google Maps Embed', 'inviro'),
-        'description' => __('Paste URL iframe dari Google Maps', 'inviro'),
-        'section'     => 'inviro_maps',
-        'type'        => 'url',
     ));
     
     // Statistics Section
@@ -1619,8 +1928,18 @@ function inviro_customize_register($wp_customize) {
     // Footer Section
     $wp_customize->add_section('inviro_footer', array(
         'title'    => __('Footer', 'inviro'),
-        'priority' => 32,
+        'priority' => 33,
     ));
+
+    // Footer - Icon next to text logotype (when no custom logo)
+    $wp_customize->add_setting('inviro_footer_logo_icon', array(
+        'default'           => '',
+        'sanitize_callback' => 'esc_url_raw',
+    ));
+    $wp_customize->add_control(new WP_Customize_Image_Control($wp_customize, 'inviro_footer_logo_icon', array(
+        'label'   => __('Gambar Ikon Logo (Footer)', 'inviro'),
+        'section' => 'inviro_footer',
+    )));
     
     $wp_customize->add_setting('inviro_footer_description', array(
         'default'           => 'Solusi terpercaya untuk usaha depot air minum Anda. Mesin berkualitas, harga terjangkau, dukungan penuh.',
@@ -1631,6 +1950,134 @@ function inviro_customize_register($wp_customize) {
         'label'    => __('Deskripsi Footer', 'inviro'),
         'section'  => 'inviro_footer',
         'type'     => 'textarea',
+    ));
+    
+    // Footer Gradient Direction
+    $wp_customize->add_setting('inviro_footer_gradient_direction', array(
+        'default'           => '90deg',
+        'sanitize_callback' => 'sanitize_text_field',
+    ));
+    
+    $wp_customize->add_control('inviro_footer_gradient_direction', array(
+        'label'    => __('Arah Gradasi', 'inviro'),
+        'section'  => 'inviro_footer',
+        'type'     => 'select',
+        'choices'  => array(
+            '0deg'   => __('Atas ke Bawah ↓', 'inviro'),
+            '90deg'  => __('Kiri ke Kanan →', 'inviro'),
+            '180deg' => __('Bawah ke Atas ↑', 'inviro'),
+            '270deg' => __('Kanan ke Kiri ←', 'inviro'),
+            '45deg'  => __('Diagonal ↗', 'inviro'),
+            '135deg' => __('Diagonal ↘', 'inviro'),
+        ),
+    ));
+    
+    // Footer Gradient Color 1
+    $wp_customize->add_setting('inviro_footer_gradient_color1', array(
+        'default'           => '#FF8C42',
+        'sanitize_callback' => 'sanitize_hex_color',
+    ));
+    
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'inviro_footer_gradient_color1', array(
+        'label'    => __('Warna 1', 'inviro'),
+        'section'  => 'inviro_footer',
+    )));
+    
+    $wp_customize->add_setting('inviro_footer_gradient_stop1', array(
+        'default'           => '0',
+        'sanitize_callback' => 'absint',
+    ));
+    
+    $wp_customize->add_control('inviro_footer_gradient_stop1', array(
+        'label'       => __('Posisi Warna 1 (%)', 'inviro'),
+        'section'     => 'inviro_footer',
+        'type'        => 'number',
+        'input_attrs' => array(
+            'min'  => 0,
+            'max'  => 100,
+            'step' => 1,
+        ),
+    ));
+    
+    // Footer Gradient Color 2
+    $wp_customize->add_setting('inviro_footer_gradient_color2', array(
+        'default'           => '#FF6B35',
+        'sanitize_callback' => 'sanitize_hex_color',
+    ));
+    
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'inviro_footer_gradient_color2', array(
+        'label'    => __('Warna 2', 'inviro'),
+        'section'  => 'inviro_footer',
+    )));
+    
+    $wp_customize->add_setting('inviro_footer_gradient_stop2', array(
+        'default'           => '25',
+        'sanitize_callback' => 'absint',
+    ));
+    
+    $wp_customize->add_control('inviro_footer_gradient_stop2', array(
+        'label'       => __('Posisi Warna 2 (%)', 'inviro'),
+        'section'     => 'inviro_footer',
+        'type'        => 'number',
+        'input_attrs' => array(
+            'min'  => 0,
+            'max'  => 100,
+            'step' => 1,
+        ),
+    ));
+    
+    // Footer Gradient Color 3
+    $wp_customize->add_setting('inviro_footer_gradient_color3', array(
+        'default'           => '#4ECDC4',
+        'sanitize_callback' => 'sanitize_hex_color',
+    ));
+    
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'inviro_footer_gradient_color3', array(
+        'label'    => __('Warna 3', 'inviro'),
+        'section'  => 'inviro_footer',
+    )));
+    
+    $wp_customize->add_setting('inviro_footer_gradient_stop3', array(
+        'default'           => '75',
+        'sanitize_callback' => 'absint',
+    ));
+    
+    $wp_customize->add_control('inviro_footer_gradient_stop3', array(
+        'label'       => __('Posisi Warna 3 (%)', 'inviro'),
+        'section'     => 'inviro_footer',
+        'type'        => 'number',
+        'input_attrs' => array(
+            'min'  => 0,
+            'max'  => 100,
+            'step' => 1,
+        ),
+    ));
+    
+    // Footer Gradient Color 4
+    $wp_customize->add_setting('inviro_footer_gradient_color4', array(
+        'default'           => '#45B7D1',
+        'sanitize_callback' => 'sanitize_hex_color',
+    ));
+    
+    $wp_customize->add_control(new WP_Customize_Color_Control($wp_customize, 'inviro_footer_gradient_color4', array(
+        'label'    => __('Warna 4', 'inviro'),
+        'section'  => 'inviro_footer',
+    )));
+    
+    $wp_customize->add_setting('inviro_footer_gradient_stop4', array(
+        'default'           => '100',
+        'sanitize_callback' => 'absint',
+    ));
+    
+    $wp_customize->add_control('inviro_footer_gradient_stop4', array(
+        'label'       => __('Posisi Warna 4 (%)', 'inviro'),
+        'section'     => 'inviro_footer',
+        'type'        => 'number',
+        'input_attrs' => array(
+            'min'  => 0,
+            'max'  => 100,
+            'step' => 1,
+        ),
     ));
     
     $wp_customize->add_setting('inviro_footer_facebook', array(

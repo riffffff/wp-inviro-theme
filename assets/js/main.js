@@ -170,30 +170,23 @@
         const prevBtn = $('.testimonial-prev');
         const nextBtn = $('.testimonial-next');
         let currentIndex = 0;
-        let cardWidth = 0;
-        let visibleCards = 3;
+        const visibleCards = 3; // Always show 3 cards
 
         if (cards.length === 0) return;
 
-        function updateCardWidth() {
-            const containerWidth = track.width();
-            if ($(window).width() <= 768) {
-                visibleCards = 1;
-            } else if ($(window).width() <= 1024) {
-                visibleCards = 2;
-            } else {
-                visibleCards = 3;
-            }
-            cardWidth = containerWidth / visibleCards;
-        }
+        // Total slides based on moving 1 card at a time
+        const maxIndex = cards.length - visibleCards;
 
+        // Create indicators based on total cards
         function createIndicators() {
             const indicatorsContainer = $('.testimonials-indicators');
             indicatorsContainer.empty();
-            const totalIndicators = Math.ceil(cards.length / visibleCards);
             
-            for (let i = 0; i < totalIndicators; i++) {
-                const indicator = $('<div class="testimonial-indicator"></div>');
+            // Create indicators for each possible position
+            const totalIndicators = Math.min(cards.length, maxIndex + 1);
+            
+            for (let i = 0; i <= maxIndex; i++) {
+                const indicator = $('<button class="testimonial-indicator"></button>');
                 if (i === 0) indicator.addClass('active');
                 indicator.on('click', function() {
                     goToSlide(i);
@@ -202,95 +195,87 @@
             }
         }
 
-        function updateCarousel() {
-            updateCardWidth();
-            const translateX = -currentIndex * cardWidth;
-            track.css('transform', `translateX(${translateX}px)`);
+        // Update carousel position with smooth transition
+        function updateCarousel(animate = true) {
+            if (animate) {
+                track.css('transition', 'transform 0.5s ease-in-out');
+            } else {
+                track.css('transition', 'none');
+            }
+            
+            // Calculate percentage to move (each card is 33.333% width)
+            const movePercentage = -(currentIndex * (100 / 3));
+            track.css('transform', `translateX(${movePercentage}%)`);
+            
             updateIndicators();
+            updateButtons();
         }
 
+        // Update indicators
         function updateIndicators() {
-            const activeIndicator = Math.floor(currentIndex / visibleCards);
             $('.testimonial-indicator').removeClass('active');
-            $('.testimonial-indicator').eq(activeIndicator).addClass('active');
+            $('.testimonial-indicator').eq(currentIndex).addClass('active');
         }
 
-        function nextSlide() {
-            const maxIndex = Math.ceil(cards.length / visibleCards) - 1;
-            if (currentIndex < maxIndex * visibleCards) {
-                currentIndex += visibleCards;
-                if (currentIndex >= cards.length) {
-                    currentIndex = 0;
-                }
+        // Update button states
+        function updateButtons() {
+            if (currentIndex === 0) {
+                prevBtn.css('opacity', '0.5').prop('disabled', true);
+            } else {
+                prevBtn.css('opacity', '1').prop('disabled', false);
+            }
+            
+            if (currentIndex >= maxIndex) {
+                nextBtn.css('opacity', '0.5').prop('disabled', true);
+            } else {
+                nextBtn.css('opacity', '1').prop('disabled', false);
+            }
+        }
+
+        // Go to specific slide
+        function goToSlide(index) {
+            if (index >= 0 && index <= maxIndex) {
+                currentIndex = index;
                 updateCarousel();
             }
         }
 
+        // Next slide (move 1 card)
+        function nextSlide() {
+            if (currentIndex < maxIndex) {
+                currentIndex++;
+                updateCarousel();
+            }
+        }
+
+        // Previous slide (move 1 card)
         function prevSlide() {
             if (currentIndex > 0) {
-                currentIndex -= visibleCards;
-                if (currentIndex < 0) {
-                    currentIndex = 0;
-                }
-                updateCarousel();
-            } else {
-                const maxIndex = Math.ceil(cards.length / visibleCards) - 1;
-                currentIndex = maxIndex * visibleCards;
+                currentIndex--;
                 updateCarousel();
             }
         }
 
-        function goToSlide(index) {
-            currentIndex = index * visibleCards;
-            updateCarousel();
-        }
-
-        nextBtn.on('click', nextSlide);
+        // Event listeners
         prevBtn.on('click', prevSlide);
-
-        // Touch/swipe support
-        let startX = 0;
-        let isDragging = false;
-
-        track.on('mousedown touchstart', function(e) {
-            isDragging = true;
-            startX = e.type === 'mousedown' ? e.pageX : e.originalEvent.touches[0].pageX;
-            track.css('cursor', 'grabbing');
-        });
-
-        $(document).on('mousemove touchmove', function(e) {
-            if (!isDragging) return;
-            e.preventDefault();
-        });
-
-        $(document).on('mouseup touchend', function(e) {
-            if (!isDragging) return;
-            isDragging = false;
-            track.css('cursor', 'grab');
-            
-            const endX = e.type === 'mouseup' ? e.pageX : e.originalEvent.changedTouches[0].pageX;
-            const diffX = startX - endX;
-            
-            if (Math.abs(diffX) > 50) {
-                if (diffX > 0) {
-                    nextSlide();
-                } else {
-                    prevSlide();
-                }
-            }
-        });
+        nextBtn.on('click', nextSlide);
 
         // Initialize
-        updateCardWidth();
-        createIndicators();
-        updateCarousel();
-
-        // Update on resize
-        $(window).on('resize', function() {
-            updateCardWidth();
+        if (cards.length > visibleCards) {
             createIndicators();
-            currentIndex = 0;
-            updateCarousel();
+            updateCarousel(false);
+        } else {
+            // If 3 or less cards, hide controls
+            $('.testimonials-controls, .testimonials-indicators').hide();
+        }
+
+        // Handle window resize
+        let resizeTimer;
+        $(window).on('resize', function() {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(function() {
+                updateCarousel(false);
+            }, 250);
         });
     }
 
@@ -411,17 +396,54 @@
     });
 
     /**
-     * Product Like Button
+     * Product Like Button with LocalStorage
      */
-    $('.product-like').on('click', function(e) {
-        e.preventDefault();
-        $(this).toggleClass('liked');
-        if ($(this).hasClass('liked')) {
-            $(this).css('color', '#e74c3c');
-        } else {
-            $(this).css('color', '');
-        }
-    });
+    function initProductLikes() {
+        // Load liked products from localStorage
+        const likedProducts = JSON.parse(localStorage.getItem('likedProducts') || '[]');
+        
+        // Apply liked state to products
+        likedProducts.forEach(function(productId) {
+            $('[data-product-id="' + productId + '"]').addClass('liked');
+        });
+        
+        // Handle like button click
+        $('.product-like').on('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const button = $(this);
+            const productCard = button.closest('.product-card');
+            const productId = productCard.attr('data-product-id') || button.attr('data-product-id');
+            
+            // Toggle liked state
+            button.toggleClass('liked');
+            
+            // Update localStorage
+            let likedProducts = JSON.parse(localStorage.getItem('likedProducts') || '[]');
+            
+            if (button.hasClass('liked')) {
+                // Add to liked
+                if (!likedProducts.includes(productId)) {
+                    likedProducts.push(productId);
+                }
+                // Add animation
+                button.animate({
+                    fontSize: '1.2em'
+                }, 100).animate({
+                    fontSize: '1em'
+                }, 100);
+            } else {
+                // Remove from liked
+                likedProducts = likedProducts.filter(id => id !== productId);
+            }
+            
+            localStorage.setItem('likedProducts', JSON.stringify(likedProducts));
+        });
+    }
+    
+    // Initialize product likes
+    initProductLikes();
 
     /**
      * Animate on Scroll
