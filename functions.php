@@ -38,24 +38,25 @@ function inviro_enqueue_files() {
     wp_enqueue_style('inviro-fonts', 'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap', array(), null);
     
     // Base styles (always loaded)
-    wp_enqueue_style('inviro-base', get_template_directory_uri() . '/assets/css/base.css', array(), '1.0.2');
-    wp_enqueue_style('inviro-header', get_template_directory_uri() . '/assets/css/header.css', array('inviro-base'), '1.0.2');
-    wp_enqueue_style('inviro-footer', get_template_directory_uri() . '/assets/css/footer.css', array('inviro-base'), '1.0.8');
+    wp_enqueue_style('inviro-base', get_template_directory_uri() . '/assets/css/base.css', array(), '1.0.3');
+    wp_enqueue_style('inviro-animations', get_template_directory_uri() . '/assets/css/animations.css', array(), '1.0.0');
+    wp_enqueue_style('inviro-header', get_template_directory_uri() . '/assets/css/header.css', array('inviro-base'), '1.0.3');
+    wp_enqueue_style('inviro-footer', get_template_directory_uri() . '/assets/css/footer.css', array('inviro-base'), '1.0.9');
     
     // Page specific styles
     if (is_front_page()) {
-        wp_enqueue_style('inviro-front-page', get_template_directory_uri() . '/assets/css/front-page.css', array('inviro-base'), '1.0.3');
+        wp_enqueue_style('inviro-front-page', get_template_directory_uri() . '/assets/css/front-page.css', array('inviro-base'), '1.0.6');
     } elseif (is_page('profil')) {
         wp_enqueue_style('inviro-profil', get_template_directory_uri() . '/assets/css/profil.css', array('inviro-base'), '1.0.0');
     } elseif (is_page('pelanggan')) {
         wp_enqueue_style('inviro-pelanggan', get_template_directory_uri() . '/assets/css/pelanggan.css', array('inviro-base'), '1.0.0');
         wp_enqueue_script('inviro-pelanggan-filter', get_template_directory_uri() . '/assets/js/pelanggan-filter.js', array('jquery'), '1.0.0', true);
-    } elseif (is_page('paket-usaha')) {
-        wp_enqueue_style('inviro-paket-usaha', get_template_directory_uri() . '/assets/css/paket-usaha.css', array('inviro-base'), '1.0.0');
+    } elseif (is_page('paket-usaha') || is_post_type_archive('paket_usaha')) {
+    wp_enqueue_style('inviro-paket-usaha', get_template_directory_uri() . '/assets/css/paket-usaha.css', array('inviro-base'), '3.0.0');
     } elseif (is_single()) {
         wp_enqueue_style('inviro-single', get_template_directory_uri() . '/assets/css/single.css', array('inviro-base'), '1.0.0');
     } elseif (is_archive() || is_post_type_archive()) {
-        wp_enqueue_style('inviro-archive', get_template_directory_uri() . '/assets/css/archive.css', array('inviro-base'), '1.0.3');
+    wp_enqueue_style('inviro-archive', get_template_directory_uri() . '/assets/css/archive.css', array('inviro-base'), '1.1.2');
     }
     
     // Enqueue main stylesheet for fallback
@@ -144,6 +145,42 @@ function inviro_register_products() {
     register_post_type('produk', $args);
 }
 add_action('init', 'inviro_register_products');
+
+// Paket Usaha Custom Post Type
+function inviro_register_paket_usaha() {
+    $labels = array(
+        'name'               => __('Paket Usaha', 'inviro'),
+        'singular_name'      => __('Paket Usaha', 'inviro'),
+        'menu_name'          => __('Paket Usaha', 'inviro'),
+        'add_new'            => __('Tambah Paket', 'inviro'),
+        'add_new_item'       => __('Tambah Paket Baru', 'inviro'),
+        'edit_item'          => __('Edit Paket', 'inviro'),
+        'new_item'           => __('Paket Baru', 'inviro'),
+        'view_item'          => __('Lihat Paket', 'inviro'),
+        'search_items'       => __('Cari Paket', 'inviro'),
+        'not_found'          => __('Paket tidak ditemukan', 'inviro'),
+        'not_found_in_trash' => __('Tidak ada paket di trash', 'inviro')
+    );
+    
+    $args = array(
+        'labels'              => $labels,
+        'public'              => false,  // Tidak ada single page
+        'publicly_queryable'  => true,   // Archive bisa diakses
+        'show_ui'             => true,   // Tampil di admin
+        'show_in_menu'        => true,
+        'query_var'           => true,
+        'has_archive'         => 'paket-usaha',  // URL archive: /paket-usaha/
+        'rewrite'             => array('slug' => 'paket-usaha', 'with_front' => false),
+        'hierarchical'        => false,
+        'menu_position'       => 5,
+        'menu_icon'           => 'dashicons-portfolio',
+        'supports'            => array('title', 'thumbnail'),  // Hanya title dan thumbnail, tanpa editor
+        'show_in_rest'        => false  // Nonaktifkan Gutenberg editor
+    );
+    
+    register_post_type('paket_usaha', $args);
+}
+add_action('init', 'inviro_register_paket_usaha');
 
 // Testimonials Custom Post Type (No Single Page)
 function inviro_register_testimonials() {
@@ -599,6 +636,94 @@ function inviro_save_product_meta($post_id) {
     }
 }
 add_action('save_post_produk', 'inviro_save_product_meta');
+
+/**
+ * Add custom meta boxes for Paket Usaha
+ */
+function inviro_add_paket_usaha_meta_boxes() {
+    add_meta_box(
+        'inviro_paket_description',
+        __('Deskripsi Paket', 'inviro'),
+        'inviro_paket_description_callback',
+        'paket_usaha',
+        'normal',
+        'high'
+    );
+    
+    add_meta_box(
+        'inviro_paket_price',
+        __('Harga Paket', 'inviro'),
+        'inviro_paket_price_callback',
+        'paket_usaha',
+        'normal',
+        'high'
+    );
+}
+add_action('add_meta_boxes', 'inviro_add_paket_usaha_meta_boxes');
+
+/**
+ * Paket Usaha Description Meta Box Callback
+ */
+function inviro_paket_description_callback($post) {
+    wp_nonce_field('inviro_paket_meta_nonce', 'inviro_paket_meta_nonce');
+    $description = get_post_meta($post->ID, '_paket_description', true);
+    ?>
+    <p>
+        <label for="paket_description"><?php _e('Deskripsi Paket:', 'inviro'); ?></label><br>
+        <textarea name="paket_description" id="paket_description" rows="5" style="width: 100%; padding: 8px;" placeholder="DAMIU Paket A dengan kapasitas..."><?php echo esc_textarea($description); ?></textarea>
+    </p>
+    <p class="description">
+        <?php _e('Tulis deskripsi lengkap tentang paket usaha ini.', 'inviro'); ?>
+    </p>
+    <?php
+}
+
+/**
+ * Paket Usaha Price Meta Box Callback
+ */
+function inviro_paket_price_callback($post) {
+    $price = get_post_meta($post->ID, '_paket_price', true);
+    ?>
+    <p>
+        <label for="paket_price"><?php _e('Harga Paket:', 'inviro'); ?></label><br>
+        <input type="text" name="paket_price" id="paket_price" value="<?php echo esc_attr($price); ?>" placeholder="Hubungi Kami" style="width: 100%; padding: 8px;" />
+    </p>
+    <p class="description">
+        <?php _e('Contoh: Rp. 5.000.000 atau "Hubungi Kami" jika harga tidak ditampilkan.', 'inviro'); ?>
+    </p>
+    <?php
+}
+
+/**
+ * Save Paket Usaha Meta
+ */
+function inviro_save_paket_usaha_meta($post_id) {
+    // Check post type
+    if (get_post_type($post_id) !== 'paket_usaha') {
+        return;
+    }
+    
+    if (!isset($_POST['inviro_paket_meta_nonce']) || !wp_verify_nonce($_POST['inviro_paket_meta_nonce'], 'inviro_paket_meta_nonce')) {
+        return;
+    }
+    
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+        return;
+    }
+    
+    if (!current_user_can('edit_post', $post_id)) {
+        return;
+    }
+    
+    if (isset($_POST['paket_description'])) {
+        update_post_meta($post_id, '_paket_description', sanitize_textarea_field($_POST['paket_description']));
+    }
+    
+    if (isset($_POST['paket_price'])) {
+        update_post_meta($post_id, '_paket_price', sanitize_text_field($_POST['paket_price']));
+    }
+}
+add_action('save_post_paket_usaha', 'inviro_save_paket_usaha_meta');
 
 /**
  * Add custom meta boxes for Testimonials

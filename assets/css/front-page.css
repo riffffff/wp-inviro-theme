@@ -394,6 +394,26 @@
     color: var(--primary-color);
 }
 
+.btn-view-all-products {
+    display: inline-block;
+    padding: 12px 30px;
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    transition: var(--transition);
+    font-size: 1rem;
+    background-color:red;
+    color: white;
+}
+
+.btn-view-all-products:hover {
+    background-color: #b30000;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
 .section-footer {
     text-align: center;
 }
@@ -805,27 +825,590 @@
 }
 
 @media (max-width: 480px) {
+    /* Hero Section - Mobile */
     .hero-section {
-        height: 300px;
+        height: 450px;
+    }
+    
+    .hero-content {
+        padding: 1.5rem;
     }
     
     .hero-title {
+        font-size: 1.75rem;
+        margin-bottom: 1rem;
+        font-weight: 800;
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    .hero-description {
+        font-size: 0.95rem;
+        line-height: 1.5;
+        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .hero-controls {
+        padding: 0 1rem;
+    }
+    
+    .hero-prev,
+    .hero-next {
+        width: 45px;
+        height: 45px;
         font-size: 1.5rem;
+        background-color: rgba(255, 255, 255, 0.25);
+        backdrop-filter: blur(15px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transition: all 0.3s ease;
+    }
+    
+    .hero-prev:hover,
+    .hero-next:hover {
+        background-color: rgba(255, 255, 255, 0.4);
+        transform: scale(1.05);
+    }
+    
+    .hero-indicators {
+        bottom: 1.5rem;
+        gap: 8px;
+    }
+    
+    .hero-indicator {
+        width: 8px;
+        height: 8px;
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 50%;
+        transition: all 0.3s ease;
+    }
+    
+    .hero-indicator.active {
+        width: 24px;
+        border-radius: 4px;
+        background: white;
+    }
+    
+    /* Stats Section - Mobile: Modern Card Layout */
+    .stats-section {
+        padding: 2rem 1rem;
+        background: linear-gradient(135deg, #75C6F1 0%, #4FB3E8 100%);
+        box-shadow: 0px 8px 24px rgba(0, 162, 231, 0.15);
+        overflow-x: hidden;
+    }
+    
+    .stats-section .container {
+        max-width: 100%;
+        padding: 0;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+        max-width: 100%;
+        width: 100%;
+    }
+    
+    .stat-item {
+        padding: 1.25rem 0.5rem;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+    
+    .stat-item:hover {
+        transform: translateY(-4px);
+        background: rgba(255, 255, 255, 0.25);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    }
+    
+    .stat-number {
+        font-size: 1.75rem;
+        line-height: 2rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        color: #fff;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stat-label {
+        font-size: 0.625rem;
+        line-height: 1.1rem;
+        font-weight: 600;
+        color: #fff;
+        opacity: 0.95;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    /* About Section - Mobile: Modern Layout */
+    .about-section {
+        padding: 2.5rem 0;
+        background: linear-gradient(180deg, white 65%, #E8F6FD 100%);
+        overflow-x: hidden;
+    }
+    
+    .about-section .container {
+        padding: 0 1rem;
+        max-width: 100%;
+        overflow: hidden;
     }
     
     .section-title {
         font-size: 1.75rem;
+        line-height: 2.25rem;
+        margin-bottom: 1rem;
+        font-weight: 800;
+    }
+    
+    .section-description {
+        font-size: 0.875rem;
+        line-height: 1.4rem;
+        opacity: 0.9;
+    }
+    
+    .about-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    /* About Branches - 2x2 Grid Layout for Mobile */
+    .about-branches {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        margin-bottom: 2rem;
+        order: -1; /* Put images before text on mobile */
+        width: 100%;
+    }
+    
+    .branch-card {
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        border: 2px solid rgba(255, 255, 255, 0.9);
+        background: white;
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    .branch-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+    
+    .branch-image {
+        height: 150px;
+        overflow: hidden;
+        position: relative;
+        width: 100%;
+    }
+    
+    .branch-image::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.05));
+    }
+    
+    .branch-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+        display: block;
+    }
+    
+    .branch-card:hover .branch-image img {
+        transform: scale(1.08);
+    }
+    
+    .branch-name {
+        padding: 0.65rem 0.4rem;
+        font-size: 0.65rem;
+        line-height: 0.95rem;
+        text-align: center;
+        color: white;
+        background: linear-gradient(135deg, #E91C2E 0%, #C71828 100%);
+        margin: 0;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .about-text h2 {
+        font-size: 1.5rem;
+        line-height: 2.25rem;
+        font-weight: 700;
+        text-align: center;
+        color: var(--text-color);
+        margin-bottom: 1rem;
+    }
+    
+    .about-text p {
+        font-size: 0.75rem;
+        line-height: 1.2rem;
+        text-align: center;
+        color: var(--text-light);
+    }
+    
+    /* Products Section - Mobile: Modern Card Grid */
+    .products-section {
+        padding: 2.5rem 1rem;
+        background: linear-gradient(180deg, #00A2E7 0%, #27AFE9 15%, #4FB3E8 100%);
+    }
+    
+    .products-section .section-title {
+        text-align: center;
+        color: #fff;
+        font-size: 1.75rem;
+        font-weight: 800;
+        line-height: 2.25rem;
+        margin-bottom: 1.5rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
     
     .products-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        padding: 0 0.5rem;
     }
     
-    .about-branches {
-        grid-template-columns: 1fr;
+    .product-card {
+        border-radius: 16px;
+        overflow: hidden;
+        border: none;
+        background: white;
+        padding: 0;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        transition: all 0.3s ease;
     }
     
+    .product-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+    }
+    
+    .product-image {
+        height: 180px;
+        border-radius: 0;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .product-image::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to bottom, transparent 60%, rgba(0, 0, 0, 0.05));
+    }
+    
+    .product-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    
+    .product-card:hover .product-image img {
+        transform: scale(1.05);
+    }
+    
+    .product-info {
+        padding: 0.875rem;
+    }
+    
+    .product-title {
+        font-size: 0.75rem;
+        line-height: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: #1A202C;
+        min-height: 2.2rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        line-clamp: 2;
+    }
+    
+    .product-price {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #919191;
+        margin-bottom: 0.75rem;
+    }
+    
+    .product-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .product-wishlist {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+    }
+    
+    .product-wishlist:hover {
+        transform: scale(1.15);
+    }
+    
+    .product-btn {
+        padding: 0.5rem 1.5rem;
+        font-size: 0.75rem;
+        font-weight: 800;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #75C6F1 0%, #4FB3E8 100%);
+        border: none;
+        color: white;
+        box-shadow: 0 4px 12px rgba(117, 198, 241, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .product-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(117, 198, 241, 0.4);
+    }
+    
+    .view-all-products {
+        margin-top: 2rem;
+        text-align: center;
+        padding: 0 1rem;
+    }
+    
+    .view-all-products a {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: white;
+        text-decoration: underline;
+        opacity: 0.9;
+        transition: opacity 0.3s ease;
+    }
+    
+    .view-all-products a:hover {
+        opacity: 1;
+    }
+    
+    /* Testimonials Section - Mobile: Modern Card Design */
+    .testimonials-section {
+        padding: 2.5rem 1rem;
+        background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%);
+    }
+    
+    .testimonials-section .section-title {
+        font-size: 1.5rem;
+        line-height: 2rem;
+        font-weight: 700;
+        color: #005BD2;
+        text-align: center;
+        margin-bottom: 0.75rem;
+    }
+    
+    .testimonials-section .section-description {
+        font-size: 0.875rem;
+        line-height: 1.4rem;
+        text-align: center;
+        color: #4A5568;
+        margin-bottom: 2rem;
+        max-width: 90%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .testimonials-wrapper {
+        overflow: visible;
+        padding: 0.5rem 0;
+    }
+    
+    .testimonial-track {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+        align-items: center;
+    }
+    
+    .testimonial-card {
+        flex: 0 0 auto;
+        width: 100%;
+        max-width: 340px;
+        min-height: 140px;
+        padding: 1.25rem;
+        background: linear-gradient(135deg, #75C6F1 0%, #5BB8ED 100%);
+        border-radius: 16px;
+        box-shadow: 0 8px 20px rgba(117, 198, 241, 0.25);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .testimonial-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 28px rgba(117, 198, 241, 0.35);
+    }
+    
+    .testimonial-header {
+        display: flex;
+        align-items: center;
+        gap: 0.875rem;
+        margin-bottom: 1rem;
+    }
+    
+    .testimonial-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .testimonial-author {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #fff;
+        line-height: 1.2;
+    }
+    
+    .testimonial-date {
+        font-size: 0.625rem;
+        color: rgba(255, 255, 255, 0.8);
+        margin-top: 2px;
+    }
+    
+    .testimonial-rating {
+        margin-left: auto;
+        font-size: 0.875rem;
+        color: #FFD700;
+        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+    }
+    
+    .testimonial-text {
+        font-size: 0.75rem;
+        line-height: 1.3rem;
+        color: rgba(255, 255, 255, 0.95);
+        font-weight: 400;
+    }
+    
+    .testimonial-prev,
+    .testimonial-next {
+        display: none;
+    }
+    
+    /* Contact/Map Section - Mobile: Modern Design */
+    .contact-section {
+        padding: 2.5rem 1rem;
+        background: white;
+    }
+    
+    .contact-map {
+        width: 100%;
+        height: 240px;
+        border-radius: 16px;
+        overflow: hidden;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid var(--border-color);
+    }
+    
+    /* Contact Form - Mobile: Modern Clean Design */
     .contact-form-wrapper {
         padding: 2rem 1.5rem;
+        background: white;
+        border-radius: 20px;
+        border: none;
+        box-shadow: 0 8px 24px rgba(24, 32, 60, 0.1);
+    }
+    
+    .contact-form-wrapper h3 {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: #005BD2;
+        line-height: 1.5;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .form-group label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #2D3748;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    
+    .form-group input,
+    .form-group textarea {
+        padding: 0.875rem 1rem;
+        font-size: 0.875rem;
+        border: 2px solid #E2E8F0;
+        border-radius: 12px;
+        box-shadow: none;
+        transition: all 0.3s ease;
+        width: 100%;
+        font-family: var(--font-primary);
+    }
+    
+    .form-group input:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #75C6F1;
+        box-shadow: 0 0 0 3px rgba(117, 198, 241, 0.1);
+    }
+    
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+        color: #A0AEC0;
+        font-size: 0.875rem;
+    }
+    
+    .form-group textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+    
+    .form-submit {
+        margin-top: 1rem;
+        text-align: center;
+    }
+    
+    .btn-submit {
+        padding: 0.875rem 2.5rem;
+        font-size: 0.875rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #27AFE9 0%, #4FB3E8 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(39, 175, 233, 0.3);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 28px rgba(39, 175, 233, 0.4);
+    }
+    
+    .btn-submit:active {
+        transform: translateY(0);
     }
 }
+

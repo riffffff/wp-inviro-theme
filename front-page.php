@@ -244,7 +244,7 @@ get_header();
             </div>
             
             <div class="section-footer">
-                <a href="<?php echo esc_url(get_post_type_archive_link('produk')); ?>" class="btn btn-outline"><?php esc_html_e('Lihat semua produk', 'inviro'); ?></a>
+                <a href="<?php echo esc_url(get_post_type_archive_link('produk')); ?>" class="btn-view-all-products"><?php esc_html_e('Lihat semua produk', 'inviro'); ?></a>
             </div>
         </div>
     </section>
